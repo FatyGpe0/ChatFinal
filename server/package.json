@@ -1,0 +1,20 @@
+{
+  "name": "sockets",
+  "version": "1.0.0",
+  "description": "es un chat cliente servidor",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run star"
+  },
+  "repository": {
+    "type": "git",
+    "url": "chat, socket, node"
+  },
+  "keywords": [
+    "chat",
+    "socket",
+    "node"
+  ],
+  "author": "Fatima Garcia",
+  "license": "ISC"
+}
