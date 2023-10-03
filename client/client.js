@@ -1,20 +1,22 @@
 const net = require('net');
-const express= require('express')
 const readline = require('readline-sync');
+const express = require('express');
+const router = express.Router();
+
 const servidor={
     port:3000,
-    host:'localhost'
+    host: 'localhost'
 }
 
 const client = net.createConnection(servidor);
 
-client.on('connect', ()=>{
-    console.log('conexion satisfactoria')
+client.on('connect',()=>{
+    console.log('conexión satisfactoria')
     sendLine()
 })
 
 client.on('data',(data)=>{
-    console.log('El servidofr dice:'+ data)
+    console.log('El servidor dice: '+ data)
     sendLine()
 })
 

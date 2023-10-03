@@ -4,63 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat</title>
-    <link href="../styles/style.css" type="css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
 </head>
 <body>
     <div class="container">
-        <form action="/">
+        <form action="/enviar" method="post">
             <br>
             <div class="form-floating">
-                <textarea disabled class="form-control" placeholder="Chat" id="floatingTextarea2" style="height: 100px" ></textarea>
+                <textarea disabled class="form-control" placeholder="Chat" id="TAMensajes" style="height: 400px" ><%= mensaje %></textarea>
                 <label for="floatingTextarea2">Mensajes</label>
               </div>
 
               <div class="input-group mb-3">
-                <input type="text" class="form-control" placeholder="Mensaje" aria-label="Mensaje" aria-describedby="button-addon2">
-                <button class="btn btn-primary" type="button" id="button-addon2">Enviar</button>
-              </div>
+                <input type="text" id="usuario" name="usuario" placeholder="Nickname" class="form-control">                
+                <input type="text" id="mensaje" name="mensaje" class="form-control" placeholder="Mensaje" aria-label="Mensaje" aria-describedby="button-addon2">
+                <button class="btn btn-primary">Enviar</button>
+            </div>            
               
         </form>
     </div>
-
-
-    <script>
-        const chatBox = document.getElementById('chat-box');
-        const messageInput = document.getElementById('message-input');
-        const sendButton = document.getElementById('send-button');
-        
-        // Crear una conexión WebSocket
-        const socket = new WebSocket('ws://localhost:4000'); // Reemplaza 'localhost:3000' con la dirección de tu servidor WebSocket
-        
-        // Manejar la conexión abierta
-        socket.addEventListener('open', (event) => {
-            console.log('Conexión WebSocket establecida');
-        });
-        
-        // Manejar los mensajes entrantes del servidor
-        socket.addEventListener('message', (event) => {
-            const message = event.data;
-            displayMessage(message);
-        });
-        
-        sendButton.addEventListener('click', () => {
-            const message = messageInput.value;
-            if (message.trim() !== '') {
-                sendMessage(message);
-                messageInput.value = '';
-            }
-        });
-        
-        function sendMessage(message) {
-            // Enviar el mensaje al servidor a través de WebSocket
-            socket.send(message);
-        }
-        
-        function displayMessage(message) {
-            chatBox.value += message + '\n';
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>   
 </body>
 </html>
