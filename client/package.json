@@ -12,6 +12,9 @@
     "socket",
     "node"
   ],
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
   "author": "Fatima Garcia",
   "license": "ISC",
   "dependencies": {
