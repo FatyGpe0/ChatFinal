@@ -8,5 +8,4 @@ const Login = new Schema({
     psw: String
 
 });
-//hola
 module.exports = mongoose.model('datos', Login);
