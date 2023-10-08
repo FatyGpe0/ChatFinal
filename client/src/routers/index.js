@@ -22,7 +22,7 @@ router.post('/add', async(req, res)=>{
 
 //ruta para inicio de sesion
 router.post('/login', async (req, res) => {
-    const { email, pws } = req.body;
+    const { email, psw } = req.body;
     
     try {
       // Busca al usuario con el correo
@@ -34,7 +34,7 @@ router.post('/login', async (req, res) => {
     }
 
       // Verificarr la contraseña
-    if (user.psw !== pws) {
+    if (user.psw !== psw) {
         return res.status(500).send("Usuario no encontrado");
     }
 
