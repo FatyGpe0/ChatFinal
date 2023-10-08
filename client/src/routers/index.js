@@ -3,6 +3,7 @@ const router = express.Router();
 const net = require('net');
 const model = require('../models/logins.js')();
 const logins = require('../models/logins.js');
+const { Console, error } = require('console');
 
 //const readline = require('readline-sync');
 
@@ -11,7 +12,7 @@ const servidor={
     host: 'localhost'
 };
 
-//ruta pra registro
+//ruta para registro
 router.post('/add', async(req, res)=>{
     const info = new logins(req.body);
     console.log(req.body);
@@ -21,34 +22,34 @@ router.post('/add', async(req, res)=>{
 
 //ruta para inicio de sesion
 router.post('/login', async (req, res) => {
-    const { email, password } = req.body;
+    const { email, pws } = req.body;
     
     try {
-      // Busca un usuario con el correo electrónico proporcionado
-    const user = await Login.findOne({ mail: email });
+      // Busca al usuario con el correo
+    const user = await logins.findOne({ email: email });
 
-      // Si no se encuentra el usuario, redirige de nuevo al formulario de inicio de sesión
+      // Verificar si encuentra al usuario
     if (!user) {
-        return res.redirect('/login');
+        return res.status(500).send("Usuario Invalido");
     }
 
-      // Verifica la contraseña
-    if (user.psw !== password) {
-        return res.redirect('/login');
+      // Verificarr la contraseña
+    if (user.psw !== pws) {
+        return res.status(500).send("Usuario no encontrado");
     }
 
-      // Si las credenciales son válidas, puedes redirigir al usuario a la página de chat o realizar otras acciones
-    res.redirect('/chat');
+      // Si el usuario es correcto envia al chat
+    res.redirect('/index');
     } catch (error) {
     console.error(error);
-    res.status(500).send('Error interno del servidor');
+    res.status(500).send('Error servidor');
     }
 });
 
 
 const client = net.createConnection(servidor);
     client.on('connect', ()=>{
-        console.log('conexion satisfactiria')
+        console.log('conexion satisfactoria')
         
     })
 
@@ -59,7 +60,7 @@ const client = net.createConnection(servidor);
         console.log('mensajes del servidor:' + mensaje)
     });
 
-router.get('/', async (req, res)=>{
+router.get('/index', async (req, res)=>{
     res.render('index.ejs', {mensaje});
 });
 
