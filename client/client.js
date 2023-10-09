@@ -24,11 +24,11 @@ client.on('error',(err)=>{
     console.log(err.message)
 })
 
-/*function sendLine(){
+function sendLine(){
     var line = readline.question('\n ingresa un mensaje \n')
     if(line==0){
         client.end()
     }else{
         client.write(line)
     }
-}*/
+}

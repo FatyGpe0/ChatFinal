@@ -9,11 +9,13 @@ const {default: mongoose} = require('mongoose');
 
 
 app.set('port', process.env.PORT || 4000 ); //asigno puerto 3000
-app.set('view engine', 'ejs');
 
 //Middleware utiliza morgan
 app.use(log('dev'));
 app.use(bodyParser.urlencoded({extended: false}));
+
+//Rutas
+app.use('/',IndexRoutes);
 
 app.use((req, res, next)=>{
     res.locals.mensajes = '';
@@ -36,9 +38,6 @@ app.get('/index', (req, res) => {
     res.render('index');
 });
 
-
-//Rutas
-app.use('/',IndexRoutes);
 
 mongoose.connect("mongodb+srv://faty:Sx09AnoKdsJewkAY@cluster0.q3on5sh.mongodb.net/Chat?retryWrites=true&w=majority")
 .then(db=>console.log('BD conectada'))
