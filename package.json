@@ -2,6 +2,7 @@
   "dependencies": {
     "cookie-session": "^2.0.0",
     "express-session": "^1.17.3",
+    "jsonwebtoken": "^9.0.2",
     "ws": "^8.14.2"
   }
 }
