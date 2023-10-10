@@ -12,12 +12,16 @@
         <form action="/send?token=<%= token %>" method="post">
             <br>
             <div class="form-floating">
-                <textarea disabled class="form-control" placeholder=""  id="floatingTextarea2" style="height: 400px"><%= mensaje %> </textarea>
+                <textarea disabled class="form-control" placeholder=""  id="floatingTextarea2" style="height: 400px">
+                    <% mensajes.forEach((mensaje) => { %>
+                        <%= mensaje.usuario %>: <%= mensaje.mensaje %>
+                        <%= new Date(mensaje.fecha).toLocaleString() %>
+                      <% }); %> </textarea>
                 <label for="floatingTextarea2">Mensajes</label>
             </div>
 
             <div class="input-group mb-3">
-                <input type="hidden" id="usuario" name="usuario" class="form-control">
+                <input type="hidden" id="usuario" name="usuario" class="form-control" value="<%= nombreUsuario %>">
                 <input type="text" id="mensaje" name="mensaje" class="form-control" placeholder="Mensaje" aria-label="Mensaje" aria-describedby="button-addon2">
                 <button class="btn btn-primary" >Enviar</button>
             </div>

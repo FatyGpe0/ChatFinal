@@ -7,6 +7,8 @@ const { Console, error } = require('console');
 const jwt = require('jsonwebtoken');
 const { decode } = require('punycode');
 const secretKey = 'tu-clave-valida';
+const Message = require('../models/message.js');
+
 
 //const readline = require('readline-sync');
 
@@ -18,9 +20,19 @@ const servidor={
 let mensaje ='';
 
 router.get('/index', verificarToken, async (req, res) => {
+  const nombreUsuario = req.usuario.nombre;
+  console.log(`Usuario logeado: ${nombreUsuario}`);
   const token = req.query.token;
-  console.log('Ruta /chat se está ejecutando'); // Agrega registros de consola
-  res.render('index', { token, mensaje }); 
+
+  try {
+    // Obtén los mensajes almacenados desde la base de datos
+    const mensajes = await Message.find().sort({ fecha: 1 }); // Ordena por fecha descendente
+
+   res.render('index', { token, nombreUsuario, mensaje, mensajes }); 
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error al obtener mensajes');
+  }
 });
 
 router.get('/', (req, res) => {
@@ -63,7 +75,7 @@ router.post('/add', async(req, res)=>{
 router.get('/', async (req, res) => {
   try {
      // Busca un usuario con el correo electrónico proporcionado
-  const users = await Usuarios.find();
+  const users = await logins.find();
      // Si las credenciales son válidas, puedes redirigir al usuario a la página de chat o realizar otras acciones
   res.render('index', {
     users
@@ -80,7 +92,7 @@ router.post('/login', async (req, res) => {
     
     try {
       // Busca al usuario con el correo
-    const user = await logins.findOne({ nombre: nombre });
+    const user = await logins.findOne({ nombre});
 
       // Verificar si encuentra al usuario
       if (!user || user.psw !== psw) {
@@ -89,16 +101,16 @@ router.post('/login', async (req, res) => {
 
     }
 
-    const usuario = { id:1, nombre: 'Ejemplo' };
+    const usuario = { id:1, nombre: `${nombre}` };
     const token = jwt.sign(usuario, secretKey, {expiresIn: '1h' });
 
       // Si el usuario es correcto envia al chat
-    res.redirect('/index?token=' + token);
+      res.redirect('/index?token=' + token);
     } catch (error) {
     console.error(error);
     res.status(500).send('Error servidor');
     }
-})
+});
 
 
 const client = net.createConnection(servidor);
@@ -116,24 +128,30 @@ const client = net.createConnection(servidor);
 
 
 //holaa
-router.post('/send', async(req, res)=>{
-  const datos = req.body;
-  if (datos && typeof datos.mensaje === 'string') {
-      console.log("Mensaje de: " + datos.mensaje);
-      client.write(datos.mensaje);
+// Ruta para enviar mensajes
+router.post('/send', async (req, res) => {
+  const { usuario, mensaje } = req.body;
+
+  if (mensaje && typeof mensaje === 'string') {
+    try {
+      // Crea una instancia del mensaje y guárdalo en la base de datos
+      const newMessage = new Message({ usuario, mensaje });
+      await newMessage.save();
+
+      // Envía el mensaje al servidor
+      const mensajeCompleto = `${usuario}: ${mensaje}`;
+      console.log("Mensaje de: " + mensajeCompleto);
+      client.write(mensajeCompleto);
+
+      const token = req.query.token;
+      res.redirect(303, '/index?token=' + token);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Error al guardar el mensaje');
+    }
   } else {
-      console.error("Error: 'mensaje' no es una cadena válida");
+    console.error("Error: 'mensaje' no es una cadena válida");
+    res.status(400).send('Mensaje no válido');
   }
-
-  const token = req.query.token;
-
-  if(token){
-    res.redirect('/index?token=' + token)
-  }else{
-    res.redirect('/index');
-  }
-  
 });
-
-
 module.exports = router;
