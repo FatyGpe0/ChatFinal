@@ -13,7 +13,7 @@
             <br>
             <div class="form-floating">
                 <textarea id="textarea" readonly class="form-control" style="height: 400px">
-                    <!-- Mostrar mensajes existentes -->
+            
                     <% mensajes.forEach((mensaje) => { %>
                       <%= mensaje.usuario %>: <%= mensaje.mensaje %>
                       <%= new Date(mensaje.fecha).toLocaleString() %>
@@ -41,16 +41,14 @@
             console.log("SSE connection established");
         };
 
-        
-        const textarea = document.getElementById('textarea');
+        // Resto del código para manejar los eventos SSE
 
         eventSource.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            console.log(data);
-            textarea.value += `${data.usuario}: ${data.mensaje}\n`;
+            textarea.value += `${data.usuario}: ${data.Message}\n`;
         };
 
-        
+        const textarea = document.getElementById('textarea');
 
         // Ajustar la altura del textarea
         function autoAdjustTextarea() {

@@ -8,6 +8,7 @@ const jwt = require('jsonwebtoken');
 const { decode } = require('punycode');
 const secretKey = 'tu-clave-valida';
 const Message = require('../models/message.js');
+const message = require('../models/message.js');
 
 
 //const readline = require('readline-sync');
@@ -157,8 +158,9 @@ router.post('/send', async (req, res) => {
       await newMessage.save();
 
       // Envía el nuevo mensaje a todos los clientes SSE
-      const data = { usuario, mensaje };
-      sendSse(data);
+      sseClients.forEach((client) => {
+        client.write(`data: ${JSON.stringify({usuario, Message})}\n\n`);
+      });
 
       const token = req.query.token;
       res.redirect(303, '/index?token=' + token);
@@ -171,14 +173,5 @@ router.post('/send', async (req, res) => {
     res.status(400).send('Mensaje no válido');
   }
 });
-
-// Función para enviar datos SSE a todos los clientes
-function sendSse(data) {
-  const eventData = `data: ${JSON.stringify(data)}\n\n`;
-  sseClients.forEach((client) => {
-    client.write(eventData);
-  });
-}
-
 
 module.exports = router;
