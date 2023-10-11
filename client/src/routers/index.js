@@ -11,6 +11,7 @@ const Message = require('../models/message.js');
 
 
 //const readline = require('readline-sync');
+const sseClients = [];
 
 const servidor={
     port:3000,
@@ -25,8 +26,8 @@ router.get('/index', verificarToken, async (req, res) => {
   const token = req.query.token;
 
   try {
-    // Obtén los mensajes almacenados desde la base de datos
-    const mensajes = await Message.find().sort({ fecha: 1 }); // Ordena por fecha descendente
+    // obtiene los mensajes almacenados desde la base de datos
+    const mensajes = await Message.find().sort({ fecha: 1 }); // Ordena por fecha descendente, para que salga el ultimo mensaje al final
 
    res.render('index', { token, nombreUsuario, mensaje, mensajes }); 
   } catch (error) {
@@ -74,9 +75,9 @@ router.post('/add', async(req, res)=>{
 //ruta para inicio de sesion
 router.get('/', async (req, res) => {
   try {
-     // Busca un usuario con el correo electrónico proporcionado
+     // Busca un usuario con el nombre proporcionado
   const users = await logins.find();
-     // Si las credenciales son válidas, puedes redirigir al usuario a la página de chat o realizar otras acciones
+     // Si las credenciales son válidas, puedes redirigir al usuario a la página de chat 
   res.render('index', {
     users
   });
@@ -91,10 +92,10 @@ router.post('/login', async (req, res) => {
     const { nombre, psw } = req.body;
     
     try {
-      // Busca al usuario con el correo
+      // Busca al usuario con el nombre
     const user = await logins.findOne({ nombre});
 
-      // Verificar si encuentra al usuario
+      // validar si encuentra al usuario
       if (!user || user.psw !== psw) {
         return res.status(401).send('Nombre o contrasena incorrectos');
       } else {  
@@ -104,7 +105,7 @@ router.post('/login', async (req, res) => {
     const usuario = { id:1, nombre: `${nombre}` };
     const token = jwt.sign(usuario, secretKey, {expiresIn: '1h' });
 
-      // Si el usuario es correcto envia al chat
+      // Si el usuario es correcto envia a la interfaz chat
       res.redirect('/index?token=' + token);
     } catch (error) {
     console.error(error);
@@ -126,6 +127,23 @@ const client = net.createConnection(servidor);
 
     });
 
+router.get("/sse", verificarToken, (req, res) => {
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  sseClients.push(res);
+
+  console.log('no se estan enviando los datos');
+
+  req.on("close", () => {
+    // Elimina la respuesta cerrada de la lista de clientes SSE
+    const index = sseClients.indexOf(res);
+    if (index !== -1) {
+      sseClients.splice(index, 1);
+    }
+  });
+});
+
+    
 
 //holaa
 // Ruta para enviar mensajes
@@ -138,10 +156,9 @@ router.post('/send', async (req, res) => {
       const newMessage = new Message({ usuario, mensaje });
       await newMessage.save();
 
-      // Envía el mensaje al servidor
-      const mensajeCompleto = `${usuario}: ${mensaje}`;
-      console.log("Mensaje de: " + mensajeCompleto);
-      client.write(mensajeCompleto);
+      // Envía el nuevo mensaje a todos los clientes SSE
+      const data = { usuario, mensaje };
+      sendSse(data);
 
       const token = req.query.token;
       res.redirect(303, '/index?token=' + token);
@@ -154,4 +171,14 @@ router.post('/send', async (req, res) => {
     res.status(400).send('Mensaje no válido');
   }
 });
+
+// Función para enviar datos SSE a todos los clientes
+function sendSse(data) {
+  const eventData = `data: ${JSON.stringify(data)}\n\n`;
+  sseClients.forEach((client) => {
+    client.write(eventData);
+  });
+}
+
+
 module.exports = router;

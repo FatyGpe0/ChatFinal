@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const router = require('../routers');
 
-function verificarToken(req, res, next){
+function verificarToken(req, res, next){ //agregamos la función para crear la verificación del token
   const token = req.header('Authorization');
 
   if(!token){

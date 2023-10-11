@@ -1,4 +1,4 @@
-const net = require('net'); //crear objeto y require es la libreria node
+const net = require('net'); //crear objeto y utiliza la libreria node
 const server = net.createServer(); //creacion de servidor
 
 const clientes = {};
@@ -14,7 +14,6 @@ server.on('connection', (socket) => {
     const mensaje = data.toString().trim();
 
     if (!nombreUsuario) {
-        // El primer mensaje enviado se considera como el nombre de usuario
         nombreUsuario = mensaje;
         clientes[nombreUsuario] = socket;
         console.log(`Usuario conectado: ${nombreUsuario}`);
@@ -22,7 +21,7 @@ server.on('connection', (socket) => {
         return;
       }
   
-      // Envía el mensaje a todos los clientes (incluido el remitente)
+      // Envía el mensaje a todos los clientes (incluido quien lo envía)
       const mensajeCompleto = `${nombreUsuario}: ${mensaje}`;
       for (const cliente in clientes) {
         clientes[cliente].write(mensajeCompleto + '\n');

@@ -12,20 +12,58 @@
         <form action="/send?token=<%= token %>" method="post">
             <br>
             <div class="form-floating">
-                <textarea disabled class="form-control" placeholder=""  id="floatingTextarea2" style="height: 400px">
+                <textarea id="textarea" readonly class="form-control" style="height: 400px">
+                    <!-- Mostrar mensajes existentes -->
                     <% mensajes.forEach((mensaje) => { %>
-                        <%= mensaje.usuario %>: <%= mensaje.mensaje %>
-                        <%= new Date(mensaje.fecha).toLocaleString() %>
-                      <% }); %> </textarea>
-                <label for="floatingTextarea2">Mensajes</label>
+                      <%= mensaje.usuario %>: <%= mensaje.mensaje %>
+                      <%= new Date(mensaje.fecha).toLocaleString() %>
+                      <% }); %>
+                  </textarea>
+                  
+                <label for="textarea">Mensajes</label>
             </div>
-
+    
             <div class="input-group mb-3">
                 <input type="hidden" id="usuario" name="usuario" class="form-control" value="<%= nombreUsuario %>">
                 <input type="text" id="mensaje" name="mensaje" class="form-control" placeholder="Mensaje" aria-label="Mensaje" aria-describedby="button-addon2">
-                <button class="btn btn-primary" >Enviar</button>
+                <button type="submit" class="btn btn-primary">Enviar</button>
             </div>
         </form>
     </div>
+    
+
+    <script>
+
+
+        const eventSource = new EventSource("/sse");
+
+        eventSource.onopen = (event) => {
+            console.log("SSE connection established");
+        };
+
+        
+        const textarea = document.getElementById('textarea');
+
+        eventSource.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            console.log(data);
+            textarea.value += `${data.usuario}: ${data.mensaje}\n`;
+        };
+
+        
+
+        // Ajustar la altura del textarea
+        function autoAdjustTextarea() {
+            textarea.style.height = 'auto';
+            textarea.style.height = (textarea.scrollHeight + 10) + 'px';
+            textarea.scrollTop = textarea.scrollHeight;
+        }
+
+        // Llamar a la función cuando se cargue la página y cuando cambie el contenido
+        window.addEventListener('load', autoAdjustTextarea);
+        textarea.addEventListener('input', autoAdjustTextarea);
+
+
+    </script>
 </body>
 </html>

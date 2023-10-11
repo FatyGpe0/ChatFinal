@@ -1,4 +1,4 @@
-
+//esquema con el modelo para poder realizar el login correctamente
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
