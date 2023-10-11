@@ -33,7 +33,7 @@
     
 
     <script>
-
+        const textarea = document.getElementById('textarea');
 
         const eventSource = new EventSource("/sse");
 
@@ -45,10 +45,9 @@
 
         eventSource.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            textarea.value += `${data.usuario}: ${data.Message}\n`;
+            const formattedDate = new Date(data.fecha).toLocaleString(); // Formatea la fecha
+            textarea.value += `${data.usuario}: ${data.mensaje}: ${data.fecha}\n`;
         };
-
-        const textarea = document.getElementById('textarea');
 
         // Ajustar la altura del textarea
         function autoAdjustTextarea() {

@@ -35,7 +35,7 @@ app.get('/', (req, res) => {
 app.get('/register', (req, res) => {
     res.render('register');
 });
-
+con
 app.get('/login', (req, res) => {
     res.render('login');
 });

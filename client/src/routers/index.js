@@ -8,7 +8,7 @@ const jwt = require('jsonwebtoken');
 const { decode } = require('punycode');
 const secretKey = 'tu-clave-valida';
 const Message = require('../models/message.js');
-const message = require('../models/message.js');
+//const message = require('../models/message.js');
 
 
 //const readline = require('readline-sync');
@@ -128,7 +128,7 @@ const client = net.createConnection(servidor);
 
     });
 
-router.get("/sse", verificarToken, (req, res) => {
+router.get("/sse", (req, res) => {
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
   sseClients.push(res);
@@ -149,17 +149,20 @@ router.get("/sse", verificarToken, (req, res) => {
 //holaa
 // Ruta para enviar mensajes
 router.post('/send', async (req, res) => {
-  const { usuario, mensaje } = req.body;
+  const { usuario, mensaje} = req.body;
 
   if (mensaje && typeof mensaje === 'string') {
     try {
+      const fecha = new Date().toLocaleString(); // Convierte la fecha a una cadena string
       // Crea una instancia del mensaje y guárdalo en la base de datos
-      const newMessage = new Message({ usuario, mensaje });
+      const newMessage = new Message({ usuario, mensaje, fecha: new Date() });
       await newMessage.save();
+
+      //console.log(mensaje)
 
       // Envía el nuevo mensaje a todos los clientes SSE
       sseClients.forEach((client) => {
-        client.write(`data: ${JSON.stringify({usuario, Message})}\n\n`);
+        client.write(`data: ${JSON.stringify({usuario, mensaje, fecha })}\n\n`);
       });
 
       const token = req.query.token;
